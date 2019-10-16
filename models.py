@@ -1,5 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.layers as kl
+import pathlib
+import time
 
 
 generator = tf.keras.models.Sequential([
@@ -111,3 +113,11 @@ def generate(image_batch, mask_batch):
     generated = generator(concat_batch)
     merged = tf.where(mask_batch >= .5, image_batch, generated)
     return merged
+
+def save(model_dir='./trained_models'):
+    """Save the models."""
+    model_dir = pathlib.Path(model_dir)
+    time_str = time.asctime().replace(' ', '-')
+    generator.save(str(model_dir/'generator_{}.h5'.format(time_str)))
+    discriminator.save(str(model_dir/'discriminator_{}.h5'.format(time_str)))
+    return str(model_dir)
