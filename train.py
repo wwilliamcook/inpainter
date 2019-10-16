@@ -5,6 +5,7 @@ Uses the high res DIV2K dataset (https://data.vision.ee.ethz.ch/cvl/DIV2K/).
 References:
 * https://www.tensorflow.org/tutorials/load_data/images
 * https://www.tensorflow.org/api_docs/python/tf/data/Dataset
+* https://www.tensorflow.org/tutorials/keras/save_and_load
 """
 
 import tensorflow as tf
@@ -13,40 +14,28 @@ import pathlib
 import os
 import zipfile
 
-from models import generate
+from models import generate, save
 from train_utils import train
 from mask_generator import buildMaskGenerator
 
 
-BATCH_SIZE = 4
+BATCH_SIZE = 16
 EPOCHS = 1
 STEPS_PER_EPOCH = 200
-IMG_HEIGHT = 512
-IMG_WIDTH = 512
-DATA_DIR = './data'
-
-train_data_url = 'http://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_HR.zip'
-valid_data_url = 'http://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip'
+IMG_HEIGHT = 720
+IMG_WIDTH = 640
+TRAIN_DATA_DIR = './data/DIV2K_train_HR'
 
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 
-data_dir = pathlib.Path(DATA_DIR).absolute()
+data_dir = pathlib.Path(TRAIN_DATA_DIR).absolute()
 
-# Download training images as zip file
-train_zip_path = str(data_dir/'train_images.zip')
-print('Downloading training images to {}'.format(train_zip_path))
-zip_path = tf.keras.utils.get_file(origin=train_data_url,
-                                   fname=train_zip_path)
-# Extract training images
-print('Extracting training images to {}'.format(str(data_dir/'DIV2K_train_HR')))
-with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-    zip_ref.extractall(str(data_dir))
 
-train_image_count = len(list((data_dir/'DIV2K_train_HR').glob('*.png')))
+train_image_count = len(list((data_dir).glob('*.png')))
 print('Loading {} training images.'.format(train_image_count))
 
-img_list_ds = tf.data.Dataset.list_files(str(data_dir/'DIV2K_train_HR/*.png'))
+img_list_ds = tf.data.Dataset.list_files(str(data_dir/'*.png'))
 # Shuffle and repeat forever
 img_list_ds = img_list_ds.shuffle(buffer_size=1000).repeat()
 
@@ -99,3 +88,7 @@ print('Successfully loaded training dataset.')
 
 print('Training.')
 train(train_ds, epochs=EPOCHS, steps_per_epoch=STEPS_PER_EPOCH)
+
+print('Saving models.')
+save()
+print('Models saved.')
