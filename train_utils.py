@@ -62,8 +62,13 @@ def train(dataset, epochs=1, steps_per_epoch=None, checkpt_freq=None):
     progbar_len = 30
     progbar_clear_str = '\b' * (2*step_len + 4 + progbar_len)
     for epoch in range(epochs):
-        print('Epoch: {}'.format(epoch + 1))
+        print('Epoch {}'.format(epoch + 1))
         start = time.time()
+        
+        print('{}/{}\t[{}]'.format(
+            '1'.rjust(step_len),
+            steps_per_epoch,
+            '.' * progbar_len), end='', flush=True)
 
         for i, (image_batch, mask_batch) in enumerate(dataset):
             progbar_fill = int(float(i) / float(steps_per_epoch) * progbar_len)
@@ -73,12 +78,10 @@ def train(dataset, epochs=1, steps_per_epoch=None, checkpt_freq=None):
                 progbar_str = '>' + '.' * (progbar_len - 1)
             else:
                 progbar_str = '=' * (progbar_fill - 1) + '>' + '.' * (progbar_len - progbar_fill)
-            if i > 0:
-                print(progbar_clear_str, end='')
-            print('{}/{}\t[{}]'.format(
-                str(i + 1).rjust(step_len, '0'),
+            print(progbar_clear_str + '{}/{}\t[{}]'.format(
+                str(i + 1).rjust(step_len),
                 steps_per_epoch,
-                progbar_str), end='')
+                progbar_str), end='', flush=True)
             
             if i >= steps_per_epoch:
                 break
@@ -87,7 +90,7 @@ def train(dataset, epochs=1, steps_per_epoch=None, checkpt_freq=None):
         print(progbar_clear_str + '{}/{}\t[{}]'.format(
             steps_per_epoch,
             steps_per_epoch,
-            '=' * progbar_len)
+            '=' * progbar_len))
 
         if checkpt_freq is not None:
             if (epoch + 1) % checkpt_freq == 0:
