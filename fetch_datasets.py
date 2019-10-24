@@ -3,6 +3,7 @@
 Uses the high res DIV2K dataset (https://data.vision.ee.ethz.ch/cvl/DIV2K/).
 """
 
+import tensorflow as tf
 import pathlib
 import os
 import zipfile
@@ -22,12 +23,15 @@ def downloadAndUnzip(zip_url, zip_path, extract_dir):
         zip_path: local path to download zip file to
         extract_dir: local directory to extract zip file to
     """
+    # Make sure data dir exists
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
     # Download
-    print('Downloading {} to {}'.format(zip_url.split('/')[-1], zip_path)
+    print('Downloading {} to {}'.format(zip_url.split('/')[-1], zip_path))
     zip_path = tf.keras.utils.get_file(origin=zip_url,
                                        fname=zip_path)
     # Extract
-    print('Extracting {} to {}'.format(zip_path, extract_dir)
+    print('Extracting {} to {}'.format(zip_path, extract_dir))
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(extract_dir)
 
