@@ -13,6 +13,7 @@ import numpy as np
 import pathlib
 import os
 import zipfile
+import argparse
 
 from models import generate, save
 from train_utils import train
@@ -25,6 +26,23 @@ STEPS_PER_EPOCH = 200
 IMG_HEIGHT = 720
 IMG_WIDTH = 640
 TRAIN_DATA_DIR = './data/DIV2K_train_HR'
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--batch_size', type=int, default=BATCH_SIZE)
+parser.add_argument('--epochs', type=int, default=EPOCHS)
+parser.add_argument('--steps_per_epoch', type=int, default=STEPS_PER_EPOCH)
+parser.add_argument('--img_height', type=int, default=IMG_HEIGHT)
+parser.add_argument('--img_width', type=int, default=IMG_WIDTH)
+parser.add_argument('--train_data_dir', type=str, default=TRAIN_DATA_DIR)
+args = parser.parse_args()
+
+BATCH_SIZE = args.batch_size
+EPOCHS = args.epochs
+STEPS_PER_EPOCH = args.steps_per_epoch
+IMG_HEIGHT = args.img_height
+IMG_WIDTH = args.img_width
+TRAIN_DATA_DIR = args.train_data_dir
 
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
