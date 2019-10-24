@@ -23,9 +23,6 @@ def downloadAndUnzip(zip_url, zip_path, extract_dir):
         zip_path: local path to download zip file to
         extract_dir: local directory to extract zip file to
     """
-    # Make sure data dir exists
-    if not os.path.exists(DATA_DIR):
-        os.mkdir(DATA_DIR)
     # Download
     print('Downloading {} to {}'.format(zip_url.split('/')[-1], zip_path))
     zip_path = tf.keras.utils.get_file(origin=zip_url,
@@ -37,19 +34,25 @@ def downloadAndUnzip(zip_url, zip_path, extract_dir):
 
 def main(args):
     data_dir = pathlib.Path(args.data_dir).absolute()
+    
+    # Make sure data dir exists
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
 
     # Download and extract training images
     downloadAndUnzip(train_data_url,
                      str(data_dir/'train_images.zip'),
-                     str(data_dir/'DIV2K_train_HR'))
+                     str(data_dir))
 
     # Download and extract validation images
     downloadAndUnzip(valid_data_url,
                      str(data_dir/'valid_images.zip'),
-                     str(data_dir/'DIV2K_valid_HR'))
+                     str(data_dir))
 
     train_image_count = len(list((data_dir/'DIV2K_train_HR').glob('*.png')))
-    print('Downloaded {} training images.'.format(train_image_count))
+    valid_image_count = len(list((data_dir/'DIV2K_valid_HR').glob('*.png')))
+    print('Downloaded {} training images and {} validation images.'.format(
+        train_image_count, valid_image_count))
 
 
 if __name__ == '__main__':
