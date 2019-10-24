@@ -58,14 +58,36 @@ def train_step(image_batch, mask_batch):
             zip(d_grad, discriminator.trainable_variables))
 
 def train(dataset, epochs=1, steps_per_epoch=None, checkpt_freq=None):
+    step_len = int(np.ceil(np.log10(steps_per_epoch)))
+    progbar_len = 30
+    progbar_clear_str = '\b' * (2*step_len + 4 + progbar_len)
     for epoch in range(epochs):
         print('Epoch: {}'.format(epoch + 1))
         start = time.time()
 
         for i, (image_batch, mask_batch) in enumerate(dataset):
+            progbar_fill = int(float(i) / float(steps_per_epoch) * progbar_len)
+            if progbar_fill == 0:
+                progbar_str = '.' * progbar_len
+            elif progbar_fill == 1:
+                progbar_str = '>' + '.' * (progbar_len - 1)
+            else:
+                progbar_str = '=' * (progbar_fill - 1) + '>' + '.' * (progbar_len - progbar_fill)
+            if i > 0:
+                print(progbar_clear_str, end='')
+            print('{}/{}\t[{}]'.format(
+                str(i + 1).rjust(step_len, '0'),
+                steps_per_epoch,
+                progbar_str), end='')
+            
             if i >= steps_per_epoch:
                 break
             train_step(image_batch, mask_batch)
+        
+        print(progbar_clear_str + '{}/{}\t[{}]'.format(
+            steps_per_epoch,
+            steps_per_epoch,
+            '=' * progbar_len)
 
         if checkpt_freq is not None:
             if (epoch + 1) % checkpt_freq == 0:
